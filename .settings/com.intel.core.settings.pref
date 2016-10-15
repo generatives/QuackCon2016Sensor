@@ -1,0 +1,5 @@
+#
+#Fri Oct 14 22:56:56 PDT 2016
+com.intel.core.target.selection="UBCWHAT"
+com.intel.core.project.type.id="com.intel.iotdevkit.cdt.iotCDTNature"
+com.intel.core.project.description="IoT"
