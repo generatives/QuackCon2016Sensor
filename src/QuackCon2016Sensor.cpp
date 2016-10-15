@@ -34,9 +34,11 @@
  */
 
 #include "mraa.hpp"
-
-#include <iostream>
-#include <unistd.h>
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "MQTTClient.h"
+#include "Publisher.hpp"
 
 /*
  * On board LED blink C++ example
@@ -50,44 +52,81 @@
  * Additional linker flags: none
  */
 
-int main()
+#define ADDRESS     "tcp://localhost:1883"
+#define CLIENTIDSUB "ExampleClientSub"
+#define TOPIC       "MQTT Examples"
+#define QOS         1
+#define TIMEOUT     10000L
+
+volatile MQTTClient_deliveryToken deliveredtoken;
+int done = 0;
+
+void delivered(void *context, MQTTClient_deliveryToken dt)
 {
-	// select onboard LED pin based on the platform type
-	// create a GPIO object from MRAA using it
-	mraa::Platform platform = mraa::getPlatformType();
-	mraa::Gpio* d_pin = NULL;
-	switch (platform) {
-		case mraa::INTEL_GALILEO_GEN1:
-			d_pin = new mraa::Gpio(3, true, true);
-			break;
-		case mraa::INTEL_GALILEO_GEN2:
-			d_pin = new mraa::Gpio(13, true, false);
-			break;
-		case mraa::INTEL_EDISON_FAB_C:
-			d_pin = new mraa::Gpio(13, true, false);
-			break;
-		default:
-			std::cerr << "Unsupported platform, exiting" << std::endl;
-			return mraa::ERROR_INVALID_PLATFORM;
-	}
-	if (d_pin == NULL) {
-		std::cerr << "Can't create mraa::Gpio object, exiting" << std::endl;
-		return mraa::ERROR_UNSPECIFIED;
-	}
+    printf("Message with token value %d delivery confirmed\n", dt);
+    deliveredtoken = dt;
+}
 
-	// set the pin as output
-	if (d_pin->dir(mraa::DIR_OUT) != mraa::SUCCESS) {
-		std::cerr << "Can't set digital pin as output, exiting" << std::endl;
-		return MRAA_ERROR_UNSPECIFIED;
-	}
+int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
+{
+    int i;
+    char* payloadptr;
 
-	// loop forever toggling the on board LED every second
-	for (;;) {
-		d_pin->write(1);
-		sleep(5);
-		d_pin->write(0);
-		sleep(1);
-	}
+    printf("Message arrived\n");
+    printf("     topic: %s\n", topicName);
+    printf("   message: %s\n", message->payload);
 
-	return mraa::SUCCESS;
+    MQTTClient_freeMessage(&message);
+    MQTTClient_free(topicName);
+
+    done += 1;
+
+    return 1;
+}
+
+void connlost(void *context, char *cause)
+{
+    printf("\nConnection lost\n");
+    printf("     cause: %s\n", cause);
+}
+
+int main(int argc, char* argv[])
+{
+//	int rc;
+//    MQTTClient subClient;
+//	MQTTClient_connectOptions subConn_opts = MQTTClient_connectOptions_initializer;
+//
+//	MQTTClient_create(&subClient, ADDRESS, CLIENTIDSUB,
+//		MQTTCLIENT_PERSISTENCE_NONE, NULL);
+//	subConn_opts.keepAliveInterval = 20;
+//	subConn_opts.cleansession = 1;
+//
+//	MQTTClient_setCallbacks(subClient, NULL, connlost, msgarrvd, delivered);
+//
+//	if ((rc = MQTTClient_connect(subClient, &subConn_opts)) != MQTTCLIENT_SUCCESS)
+//	{
+//		printf("Failed to connect, return code %d\n", rc);
+//		exit(-1);
+//	}
+//
+//	MQTTClient_subscribe(subClient, TOPIC, QOS);
+	printf("Start");
+
+	Publisher publisher = Publisher();
+	publisher.Send(true);
+	publisher.Send(true);
+	publisher.Send(false);
+	publisher.Send(false);
+	publisher.Send(true);
+
+	printf("Done");
+
+//    while(done < 5) {
+//    }
+//
+//
+//    MQTTClient_disconnect(subClient, 10000);
+//    MQTTClient_destroy(&subClient);
+
+    return 0;
 }
