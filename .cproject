@@ -34,6 +34,9 @@
 								</inputType>
 							</tool>
 							<tool id="com.intel.issiot.cdt.tool.gnu.cross.cpp.linker.2074446392" name="IoT Cross G++ Linker" superClass="com.intel.issiot.cdt.tool.gnu.cross.cpp.linker">
+								<option id="com.intel.issiot.cdt.gnu.cpp.option.link.libs.1704348995" name="Libraries" superClass="com.intel.issiot.cdt.gnu.cpp.option.link.libs"/>
+								<option id="gnu.cpp.link.option.shared.32398254" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
+								<option id="com.intel.issiot.cdt.gnu.cpp.option.link.misc.other.1364052602" superClass="com.intel.issiot.cdt.gnu.cpp.option.link.misc.other" value="-lpaho-mqtt3c" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1558716133" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -117,4 +120,5 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
 </cproject>
